@@ -20,6 +20,7 @@ const Input = (
 		isFocused = false,
 		accept = null,
 		icon = null,
+		borderless = false,
 	},
 	ref
 ) => {
@@ -48,7 +49,9 @@ const Input = (
 					type={type}
 					name={name}
 					value={values}
-					className={`mt-1 block min-w-max p-2 border border-gray-200 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500  ${
+					className={`mt-1 block w-full p-2 ${
+						borderless ? "" : "border border-gray-200 shadow-sm"
+					} rounded-md focus:border-indigo-500 focus:ring-indigo-500  ${
 						error ? "border-red-300" : ""
 					}`}
 					autoComplete={name}
