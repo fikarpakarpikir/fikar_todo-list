@@ -1,3 +1,4 @@
+import { logout } from "@/lib/auth";
 import AuthGuard from "@/middleware/AuthGuard";
 import {
 	processMessageFailedReducer,
@@ -133,7 +134,7 @@ export default function AuthenticatedLayout({ header, auth, flash, children }) {
 											<span className='ms-3'>Dashboard</span>
 										</DropdownItem>
 										<DropdownDivider />
-										<DropdownItem onClick={() => handleLogout()}>
+										<DropdownItem onClick={() => logout()}>
 											<div className='w-5 h-5 text-center'>
 												<FontAwesomeIcon
 													icon={faPowerOff}
