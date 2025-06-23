@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
+}
+@theme {
+	--color-primary: #0a73a4;
+	--color-primary2: #036694;
+	--color-primary3: rgb(52, 84, 110);
+	--color-secondary: #d1d1d1;
+	--color-secondary2: #f0f0f0;
+	--color-tertiary: #ffba00;
+}
+
+/* SCROLLBAR */
+/* width */
+::-webkit-scrollbar {
+	width: 7px;
+	height: 7px;
+	opacity: 0.1;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 5px grey;
+	border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: var(--primary);
+	border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: var(--primary2);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+	}
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+	.btn {
+		@apply cursor-pointer transition duration-300 ease-in-out focus:ring-2 focus:ring-[color:var(--color-primary)] disabled:opacity-75 disabled:bg-gray-400 rounded-lg text-sm md:text-base px-3 py-2;
+	}
+
+	.btn-primary {
+		@apply text-white bg-[color:var(--color-primary)] hover:bg-[color:var(--color-primary2)] focus:ring-2 focus:ring-[color:var(--color-primary2)];
+	}
+
+	.btn-secondary {
+		@apply bg-[color:var(--color-secondary)] hover:bg-[color:var(--color-secondary2)] focus:ring-2 focus:ring-[color:var(--color-secondary2)];
+	}
+
+	.btn-success {
+		@apply bg-green-500 hover:bg-[color:var(--color-secondary2)] focus:ring-2 focus:ring-[color:var(--color-secondary2)];
+	}
+
+	.btn-danger {
+		@apply bg-red-500 hover:bg-[color:var(--color-secondary2)] focus:ring-2 focus:ring-[color:var(--color-secondary2)] text-white;
+	}
+
+	.btn-tertiary {
+		@apply bg-[color:var(--color-tertiary)] hover:bg-[color:var(--color-secondary2)] focus:ring-2 focus:ring-[color:var(--color-secondary2)];
+	}
+
+	.btn-outline-primary {
+		@apply text-[color:var(--color-primary)] border border-[color:var(--color-primary)] hover:text-white hover:bg-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary2)] disabled:opacity-75 disabled:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300;
+	}
+
+	.btn-outline-primary2 {
+		@apply text-[color:var(--color-primary2)] border border-[color:var(--color-primary2)] hover:text-white hover:bg-[color:var(--color-primary2)] focus:ring-2 focus:ring-[color:var(--color-primary2)];
+	}
+
+	.btn-outline-danger {
+		@apply flex justify-center items-center gap-1 text-red-500 border border-red-500 hover:text-white hover:bg-red-500 focus:ring-2 focus:ring-red-500;
+	}
+
+	.text-2xs {
+		font-size: 0.65rem;
+		line-height: 0.85rem;
+	}
+
+	.text-3xs {
+		font-size: 0.5rem;
+		line-height: 0.75rem;
+	}
+
+	.text-success {
+		@apply text-green-600;
+	}
+
+	.text-danger {
+		@apply text-red-700;
+	}
+
+	.badge {
+		@apply rounded-full px-2 py-1;
+	}
+
+	.bg-outline-primary {
+		@apply text-[color:var(--color-primary)] border border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary2)] disabled:opacity-75 disabled:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300;
+	}
+
+	.trix-caption-hidden figcaption {
+		@apply hidden;
+	}
+
+	.scrollbar-hide {
+		scrollbar-width: none; /* Firefox */
+		-ms-overflow-style: none; /* IE 10+ */
+	}
+
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none; /* Chrome, Safari, Opera */
+	}
 }
