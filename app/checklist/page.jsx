@@ -1,14 +1,15 @@
 "use client";
 import AuthenticatedLayout from "@/layouts/AuthenticatedLayout";
+import api from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Checklist() {
 	const [checklists, setChecklists] = useState([]);
 
-	// useEffect(() => {
-	// 	api.get("/checklists").then((res) => setChecklists(res.data));
-	// }, []);
+	useEffect(() => {
+		api.get("/checklist").then((res) => setChecklists(res.data));
+	}, []);
 
 	const handleDelete = async (id) => {
 		await api.delete(`/checklists/${id}`);

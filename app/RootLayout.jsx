@@ -14,7 +14,7 @@ export default function ClientRootLayout({ children }) {
 	}, []);
 	return (
 		<div role='main'>
-			{!isLoaded ? (
+			{/* {!isLoaded ? (
 				<div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-white z-50'>
 					<div className='text-center text-primary'>
 						Sebentar ya...
@@ -28,20 +28,13 @@ export default function ClientRootLayout({ children }) {
 								repeat: Infinity,
 								ease: "easeInOut",
 							}}>
-							{/* <Image
-								src='/logo/png/tertiary_1.png'
-								alt='loader'
-								width={150}
-								height={150}
-							/> */}
 						</motion.div>
 					</div>
 				</div>
 			) : (
-				// <SessionProvider>
-				<Provider store={store}>{children}</Provider>
-				// </SessionProvider>
-			)}
+                 */}
+
+			<Provider store={store}>{children}</Provider>
 		</div>
 	);
 }
