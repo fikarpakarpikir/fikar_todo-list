@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { processStateReducer } from "./slice/processStateSlice";
+import checklistSlice from "./slice/checklistSlice";
 
 const processReducer = combineReducers({
 	default: processStateReducer,
@@ -8,6 +9,7 @@ const processReducer = combineReducers({
 const store = configureStore({
 	reducer: {
 		process: processReducer,
+		checklist: checklistSlice,
 	},
 });
 
