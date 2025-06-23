@@ -28,12 +28,12 @@ export default function ClientRootLayout({ children }) {
 								repeat: Infinity,
 								ease: "easeInOut",
 							}}>
-							<Image
+							{/* <Image
 								src='/logo/png/tertiary_1.png'
 								alt='loader'
 								width={150}
 								height={150}
-							/>
+							/> */}
 						</motion.div>
 					</div>
 				</div>

@@ -7,9 +7,12 @@ import Input from "@/components/Forn/Input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Spinner from "@/components/Spinner";
+import { login, register } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 const AuthPage = () => {
 	const dispatch = useDispatch();
+	const router = useRouter();
 	const { processState, processMessage, processMessageFailed } = useSelector(
 		(state) => state.process.default
 	);
@@ -52,81 +55,20 @@ const AuthPage = () => {
 	});
 
 	const handleRegister = async (values) => {
-		const form = new FormData();
-		form.append("username", values.username);
-		form.append("email", values.email);
-		form.append("password", values.password);
-		try {
-			const resp = await sendDataGeneral({
-				data: form,
-				route: route("daftar"),
-				prosesReducer: processStateReducer,
-				messageFailedReducer: processMessageFailedReducer,
-				dispatch: dispatch,
-			});
-
-			if (resp.status === 200) {
-				// console.log(resp.data?.message?.success);
-				// location.reload();s
-				dispatch(processMessageReducer(resp.data?.message?.success));
-				setShowDaftar(false);
-			} else if (resp.status === 419) {
-				dispatch(
-					messageFailedReducer(
-						"Session Anda habis, sistem akan reload halaman otomatis"
-					)
-				);
-				setTimeout(() => location.reload(), 2000);
-			}
-			// Navigate to home only after successful authentication
-		} catch (error) {
-			// console.error("Authentication failed:", error);
-			if (error.status === 419) {
-				dispatch(
-					messageFailedReducer(
-						"Session Anda habis, sistem akan reload halaman otomatis"
-					)
-				);
-				setTimeout(() => location.reload(), 2000);
-			}
+		const res = await register(values.username, values.email, values.password);
+		if (res.success) {
+			router.push("/login");
+		} else {
+			setErrorMsg(res.error);
 		}
 	};
 
 	const handleLogin = async (values) => {
-		const form = new FormData();
-		form.append("username", values.username);
-		form.append("password", values.password);
-		try {
-			const resp = await sendDataGeneral({
-				data: form,
-				route: route("authenticate"),
-				prosesReducer: spinnerProsesStateReducer,
-				dispatch: dispatch,
-				messageFailedReducer: messageFailedReducer,
-			});
-
-			// console.log(resp);
-			if (resp.status === 200) {
-				location.replace(route("home"));
-			} else if (resp.status === 419) {
-				dispatch(
-					messageFailedReducer(
-						"Session Anda habis, sistem akan reload halaman otomatis"
-					)
-				);
-				setTimeout(() => location.reload(), 2000);
-			}
-			// Navigate to home only after successful authentication
-		} catch (error) {
-			// console.error("Authentication failed:", error);
-			if (error.status === 419) {
-				dispatch(
-					messageFailedReducer(
-						"Session Anda habis, sistem akan reload halaman otomatis"
-					)
-				);
-				setTimeout(() => location.reload(), 2000);
-			}
+		const res = await login(values.username, values.password);
+		if (res.success) {
+			router.push("/checklist");
+		} else {
+			setErrorMsg(res.error);
 		}
 		// Add API request for login
 	};
@@ -560,6 +502,7 @@ const AuthPage = () => {
 								<button
 									type='submit'
 									className='btn btn-primary mt-3'
+									onClick={handleSubmit}
 									disabled={isSubmitting}>
 									{isSubmitting ? <Spinner /> : "Sign Up"}
 								</button>
