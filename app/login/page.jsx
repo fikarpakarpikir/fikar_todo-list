@@ -9,6 +9,10 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Spinner from "@/components/Spinner";
 import { login, register } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import {
+	processMessageFailedReducer,
+	processStateReducer,
+} from "@/utils/redux/slice/processStateSlice";
 
 const AuthPage = () => {
 	const dispatch = useDispatch();
@@ -25,6 +29,7 @@ const AuthPage = () => {
 	});
 
 	const [showDaftar, setShowDaftar] = useState(false);
+	const [errorMsg, setErrorMsg] = useState("");
 	const toggleShowDaftar = () => setShowDaftar((prev) => !prev);
 
 	const togglePassword = (field) => {
@@ -58,8 +63,9 @@ const AuthPage = () => {
 		const res = await register(values.username, values.email, values.password);
 		if (res.success) {
 			router.push("/login");
+			dispatch(processStateReducer("success"));
 		} else {
-			setErrorMsg(res.error);
+			setErrorMsg(res.ErrorMessage);
 		}
 	};
 
@@ -68,6 +74,8 @@ const AuthPage = () => {
 		if (res.success) {
 			router.push("/checklist");
 		} else {
+			console.log(res);
+
 			setErrorMsg(res.error);
 		}
 		// Add API request for login
@@ -75,269 +83,9 @@ const AuthPage = () => {
 
 	const MessageFailed = () => {
 		return (
-			processMessageFailed && (
-				<div className='mb-4 text-sm font-medium text-danger'>
-					{processMessageFailed}
-				</div>
+			errorMsg && (
+				<div className='mb-4 text-sm font-medium text-danger'>{errorMsg}</div>
 			)
-		);
-	};
-
-	const LupaPassword = () => {
-		const dispatch = useDispatch();
-		const [show, setShow] = useState(false);
-		const [showEditPw, setShowEditPw] = useState(false);
-		const [encId, setEncId] = useState(null);
-		const [msgNull, setMsgNull] = useState(null);
-		const toggleShow = () => setShow(!show);
-		const toggleShowEditPw = () => setShowEditPw(!showEditPw);
-
-		const getUser = async (values) => {
-			const form = new FormData();
-			form.append("username", values.username);
-			form.append("email", values.email);
-			form.append("tanggal", values.tanggal);
-
-			const respUser = await sendDataGeneral({
-				data: form,
-				route: route("password.lupa"),
-				// prosesReducer: processStateReducer,
-				// messageFailedReducer: processMessageFailedReducer,
-				dispatch,
-				waitUntilFinish: true,
-				handleClose: () => toggleShowEditPw(),
-			});
-
-			if ([200, 201, 204].includes(respUser?.status)) {
-				// setShowDaftar(false);
-				toggleShowEditPw();
-				setMsgNull(null);
-				setEncId(respUser?.data);
-			} else if (respUser?.status === 419) {
-				dispatch(
-					messageFailedReducer(
-						"Session Anda habis, sistem akan reload halaman otomatis"
-					)
-				);
-				setTimeout(() => location.reload(), 2000);
-			} else {
-				setMsgNull("Data tidak ditemukan");
-			}
-		};
-
-		const [showPassword, setShowPassword] = useState({
-			password: false,
-			passwordConfirm: false,
-		});
-
-		const togglePassword = (field) => {
-			setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
-		};
-		const validationSchema = Yup.object().shape({
-			password: Yup.string()
-				// .min(6, "Minimum 6 characters")
-				.required("Password harus diisi"),
-			passwordConfirm: Yup.string()
-				.oneOf([Yup.ref("password"), null], "Konfirmasi password harus sama")
-				.required("Konfirmasi password wajib diisi"),
-		});
-		const handleGantiPassword = async (data) => {
-			const form = new FormData();
-			form.append("user_id", encId);
-			form.append("password", encLaravel(data.password));
-			form.append("passwordConfirm", encLaravel(data.passwordConfirm));
-
-			await sendDataGeneral({
-				data: form,
-				route: route("password.lupa.change"),
-				prosesReducer: processStateReducer,
-				messageFailedReducer: processMessageFailedReducer,
-				dispatch,
-				handleClose: () => {
-					toggleShow();
-					setShowEditPw(false);
-				},
-				waitUntilFinish: true,
-			});
-		};
-		return (
-			<>
-				<button
-					type='button'
-					className='btn btn-outline-warning text-capitalize m-0 px-3 py-1'
-					style={{ fontSize: "0.5 rem" }}
-					onClick={toggleShow}>
-					Lupa Password?
-				</button>
-				<ModalStatic
-					show={show}
-					handleClose={() => {
-						toggleShow();
-						toggleShowEditPw();
-						setEncId("");
-					}}>
-					{msgNull && (
-						<div className='text-center'>
-							<span className='text-sm text-danger fw-bold'>
-								Data tidak ditemukan
-							</span>
-						</div>
-					)}
-					{showEditPw && encId ? (
-						<Formik
-							initialValues={{
-								password: "",
-								passwordConfirm: "",
-							}}
-							validationSchema={validationSchema}
-							onSubmit={(values) => handleGantiPassword(values)}>
-							{({
-								isSubmitting,
-								errors,
-								values,
-								touched,
-								handleSubmit,
-								handleChange,
-								handleBlur,
-							}) => (
-								<Form>
-									<div className='text-center'>
-										<span className='text-sm text-dark fw-bold'>
-											Silakan Ganti Password Anda
-										</span>
-										<br />
-									</div>
-									<div className='position-relative col-12 mb-2'>
-										<Input
-											className='col-12'
-											id={"password"}
-											name={"password"}
-											type={showPassword.password ? "text" : "password"}
-											error={errors.password}
-											touched={touched.password}
-											values={values.password}
-											handleBlur={handleBlur}
-											handleChange={handleChange}
-											placeholder='Password'
-										/>
-										<span
-											type='button'
-											className={`fa-solid fa-eye position-absolute end-0 top-50 translate-middle fs-6 ${
-												errors.password ? "mt-n2" : "mt-0"
-											}`}
-											onClick={() => togglePassword("password")}></span>
-									</div>
-									<div className='position-relative col-12 mb-2'>
-										<Input
-											className='col-12'
-											id={"passwordConfirm"}
-											name={"passwordConfirm"}
-											type={showPassword.passwordConfirm ? "text" : "password"}
-											error={errors.passwordConfirm}
-											touched={touched.passwordConfirm}
-											values={values.passwordConfirm}
-											handleBlur={handleBlur}
-											handleChange={handleChange}
-											placeholder='Ulangi Password'
-										/>
-										<span
-											type='button'
-											className={`fa-solid fa-eye position-absolute end-0 top-50 translate-middle fs-6 ${
-												errors.passwordConfirm ? "mt-n2" : "mt-0"
-											}`}
-											onClick={() => togglePassword("passwordConfirm")}></span>
-									</div>
-									<div className='text-end'>
-										<button
-											type='submit'
-											className='btn btn-primary mt-3'
-											disabled={isSubmitting}>
-											{isSubmitting ? <Spinner /> : "Ganti"}
-										</button>
-									</div>
-								</Form>
-							)}
-						</Formik>
-					) : (
-						<Formik
-							initialValues={{
-								username: "",
-								email: "",
-								tanggal: "",
-							}}
-							validationSchema={Yup.object({
-								email: Yup.string()
-									.email("Format email salah")
-									.required("Email harus diisi"),
-								username: Yup.string().required("Wajib diisi"),
-								tanggal: Yup.string().required("Tanggal daftar wajib diisi"),
-							})}
-							onSubmit={getUser}>
-							{({
-								isSubmitting,
-								handleBlur,
-								handleChange,
-								handleSubmit,
-								values,
-								errors,
-								touched,
-							}) => (
-								<Form>
-									<div className='text-center'>
-										<span className='text-sm text-dark fw-bold'>
-											Silakan Konfirmasi Akun Anda
-										</span>
-										<br />
-									</div>
-									<MessageFailed />
-									<Input
-										className='col-12'
-										id={"username"}
-										name={"username"}
-										error={errors.username}
-										touched={touched.username}
-										values={values.username}
-										handleBlur={handleBlur}
-										handleChange={handleChange}
-										placeholder='Username'
-									/>
-									<Input
-										className='col-12'
-										id={"email"}
-										type='email'
-										name={"email"}
-										error={errors.email}
-										touched={touched.email}
-										values={values.email}
-										handleBlur={handleBlur}
-										handleChange={handleChange}
-										placeholder='Email'
-									/>
-									<Input
-										className='col-12'
-										label='Tanggal Mendaftar'
-										id={"tanggal"}
-										type='date'
-										name={"tanggal"}
-										error={errors.tanggal}
-										touched={touched.tanggal}
-										values={values.tanggal}
-										handleBlur={handleBlur}
-										handleChange={handleChange}
-									/>
-									<button
-										type='submit'
-										className='btn btn-dark mt-3'
-										onClick={handleSubmit}
-										disabled={isSubmitting}>
-										{isSubmitting ? <Spinner /> : "Konfirm"}
-									</button>
-								</Form>
-							)}
-						</Formik>
-					)}
-				</ModalStatic>
-			</>
 		);
 	};
 
@@ -360,7 +108,6 @@ const AuthPage = () => {
 						}) => (
 							<Form>
 								<h1 className='font-bold text-xl mb-4'>Sign In</h1>
-								<MessageFailed />
 								<Input
 									id={"username"}
 									name={"username"}
@@ -394,6 +141,7 @@ const AuthPage = () => {
 										/>
 									</span>
 								</div>
+								<MessageFailed />
 								<button
 									type='submit'
 									className='btn btn-primary mt-3'
